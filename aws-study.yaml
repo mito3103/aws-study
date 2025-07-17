@@ -1,9 +1,13 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
 Parameters:
-  awsstudycf:
+  awsstudycfkey:
     Type: AWS::EC2::KeyPair::KeyName
     Description: EC2の事前作成Keypair
+
+  prefix:
+    Type: String
+    Default: aws-study
 
 Resources:
   awsstudycfvpc:
@@ -14,14 +18,14 @@ Resources:
       EnableDnsHostnames: true
       Tags:
       - Key: Name
-        Value: aws-study-cf-vpc
+        Value: !Sub ${prefix}-cf-vpc
 
   awsstudycfigw:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
       - Key: Name
-        Value: aws-study-cf-igw
+        Value: !Sub ${prefix}-cf-igw
 
   GatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -35,7 +39,7 @@ Resources:
       VpcId: !Ref awsstudycfvpc
       Tags:
       - Key: Name
-        Value: aws-study-cf-public-rtb
+        Value: !Sub ${prefix}-cf-public-rtb
 
   PublicRoute:
     Type: AWS::EC2::Route
@@ -53,7 +57,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
       - Key: Name
-        Value: aws-study-cf-public-subnet1
+        Value: !Sub ${prefix}-cf-public-subnet1
 
   awsstudycfpublicsubnet2:
     Type: AWS::EC2::Subnet
@@ -64,7 +68,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
       - Key: Name
-        Value: aws-study-cf-public-subnet2
+        Value: !Sub ${prefix}-cf-public-subnet2
 
   PublicSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -85,7 +89,7 @@ Resources:
       VpcId: !Ref awsstudycfvpc
       Tags:
       - Key: Name
-        Value: aws-study-cf-rtb-private-ap-northeast-1a
+        Value: !Sub ${prefix}-cf-rtb-private-ap-northeast-1a
 
   awsstudycfrtbprivateapnortheast1c:
     Type: AWS::EC2::RouteTable
@@ -93,7 +97,7 @@ Resources:
       VpcId: !Ref awsstudycfvpc
       Tags:
       - Key: Name
-        Value: aws-study-cf-rtb-private-ap-northeast-1c
+        Value: !Sub ${prefix}-cf-rtb-private-ap-northeast-1c
 
   awsstudycfprivatesubnet1:
     Type: AWS::EC2::Subnet
@@ -104,7 +108,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
       - Key: Name
-        Value: aws-study-cf-private-subnet1
+        Value: !Sub ${prefix}-cf-private-subnet1
 
   awsstudycfprivatesubnet2:
     Type: AWS::EC2::Subnet
@@ -115,7 +119,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
       - Key: Name
-        Value: aws-study-cf-private-subnet2
+        Value: !Sub ${prefix}-cf-private-subnet2
 
   awsstudycfprivatesubnet1association:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -139,10 +143,10 @@ Resources:
       SubnetId: !Ref awsstudycfpublicsubnet1
       SecurityGroupIds:
       - !Ref awsstudycfec2sg
-      KeyName: !Ref awsstudycf
+      KeyName: !Ref awsstudycfkey
       Tags:
       - Key: Name
-        Value: aws-study-cf-ec2
+        Value: !Sub ${prefix}-cf-ec2
 
   awsstudycfec2sg:
     Type: AWS::EC2::SecurityGroup
@@ -153,22 +157,14 @@ Resources:
       -   IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: 0.0.0.0/0
-      -   IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
-      -   IpProtocol: tcp
-          FromPort: 8080
-          ToPort: 8080
-          CidrIp: 0.0.0.0/0
+          CidrIp: 111.191.60.158/32
       -   IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: 0.0.0.0/0
+          CidrIp: 111.191.60.158/32
       SecurityGroupEgress:
       -   IpProtocol: -1
           CidrIp: 0.0.0.0/0
       Tags:
       - Key: Name
-        Value: aws-study-cf-ec2-sg
+        Value: !Sub ${prefix}-cf-ec2-sg
