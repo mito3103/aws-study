@@ -170,7 +170,7 @@ Resources:
       -   IpProtocol: tcp
           FromPort: 8080
           ToPort: 8080
-          CidrIp: 111.191.60.158/32    
+          SourceSecurityGroupId: !Ref awsstudycfalbsg 
       SecurityGroupEgress:
       -   IpProtocol: -1
           CidrIp: 0.0.0.0/0
