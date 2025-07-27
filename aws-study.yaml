@@ -8,6 +8,15 @@ Parameters:
   prefix:
     Type: String
     Default: aws-study
+  
+  DBUsername:
+    Type: String
+    Default: root
+  
+  DBMasterPassword:
+    NoEcho: true
+    Description: RDS master password
+    Type: String
 
 Resources:
   awsstudycfvpc:
@@ -159,12 +168,149 @@ Resources:
           ToPort: 22
           CidrIp: 111.191.60.158/32
       -   IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 111.191.60.158/32
+          FromPort: 8080
+          ToPort: 8080
+          SourceSecurityGroupId: !Ref awsstudycfalbsg 
       SecurityGroupEgress:
       -   IpProtocol: -1
           CidrIp: 0.0.0.0/0
       Tags:
       - Key: Name
         Value: !Sub ${prefix}-cf-ec2-sg
+
+  awsstudycfrdssg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref awsstudycfvpc
+      GroupDescription: rdssecurity
+      SecurityGroupIngress:
+      -   IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref awsstudycfec2sg
+      SecurityGroupEgress:
+      -   IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+      - Key: Name
+        Value: !Sub ${prefix}-cf-rds-sg
+  
+  awsstudycfalbsg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref awsstudycfvpc
+      GroupDescription: albsecurity
+      SecurityGroupIngress:
+      -   IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 111.191.60.158/32
+      Tags:
+      - Key: Name
+        Value: !Sub ${prefix}-cf-alb-sg
+
+  DBSubnetGroup: 
+    Type: AWS::RDS::DBSubnetGroup
+    Properties: 
+      DBSubnetGroupDescription: Description of subnet group
+      SubnetIds: 
+        - !Ref awsstudycfprivatesubnet1
+        - !Ref awsstudycfprivatesubnet2
+      Tags: 
+        - Key: Name
+          Value: !Sub ${prefix}-cf-rds-subnetgp
+
+  RDSMonitoringRole:
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${prefix}-cf-monitoring-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: monitoring.rds.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole
+
+  awsstudycfrds:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      AllocatedStorage: '20'
+      DBInstanceClass: db.t4g.micro
+      AllowMajorVersionUpgrade: false
+      AutoMinorVersionUpgrade: true
+      AvailabilityZone: !Select [0,!GetAZs '']
+      BackupRetentionPeriod: '1'
+      DBInstanceIdentifier: !Sub ${prefix}-cf-rds
+      DBName: awsstudy
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      Engine: mysql
+      EngineVersion: 8.0.39
+      LicenseModel: general-public-license
+      MasterUsername: !Ref DBUsername 
+      MasterUserPassword: !Ref DBMasterPassword
+      MonitoringInterval: '60'
+      MonitoringRoleArn: !GetAtt RDSMonitoringRole.Arn
+      EnableCloudwatchLogsExports:
+        - error
+        - slowquery
+        - audit
+        - general
+      MultiAZ: false
+      Port: 3306
+      PubliclyAccessible: false
+      StorageEncrypted: true
+      StorageType: gp2
+      VPCSecurityGroups: 
+        - !GetAtt awsstudycfrdssg.GroupId
+      Tags:
+        - Key: Name
+          Value: aws-study-cf-rds
+
+  awsstudyalb:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: aws-study-cf-alb
+      Type: application
+      Scheme: internet-facing
+      IpAddressType: ipv4
+      SecurityGroups:
+        - !Ref awsstudycfalbsg
+      Subnets:
+        - !Ref awsstudycfpublicsubnet1
+        - !Ref awsstudycfpublicsubnet2
+  
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref awsstudyalb
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref awsstudycftg
+      
+  awsstudycftg:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: aws-study-cf-tg
+      Protocol: HTTP
+      Port: 80
+      TargetType: instance
+      Targets:
+      - Id: !Ref awsstudycfec2
+        Port: 8080
+      VpcId: !Ref awsstudycfvpc
+      HealthCheckPath: /
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 3
+      UnhealthyThresholdCount: 2
+      Matcher:
+        HttpCode: 200,300,301
