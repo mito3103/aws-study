@@ -18,6 +18,16 @@ Parameters:
     Description: RDS master password
     Type: String
 
+#Cloudwatchパラメータ
+  Threshold: 
+    Description: CPUUtilization Value
+    Type: Number
+
+#SNSパラメータ
+  EndPoint:
+    Description: SNS send email
+    Type: String
+
 Resources:
   awsstudycfvpc:
     Type: AWS::EC2::VPC
@@ -148,7 +158,7 @@ Resources:
     Properties:
       ImageId: ami-0f95ad36d6d54ceba
       InstanceType: t2.micro
-      DisableApiTermination: true
+      #DisableApiTermination: true
       SubnetId: !Ref awsstudycfpublicsubnet1
       SecurityGroupIds:
       - !Ref awsstudycfec2sg
@@ -271,12 +281,12 @@ Resources:
         - !GetAtt awsstudycfrdssg.GroupId
       Tags:
         - Key: Name
-          Value: aws-study-cf-rds
+          Value: !Sub ${prefix}-cf-rds
 
-  awsstudyalb:
+  awsstudycfalb:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: aws-study-cf-alb
+      Name: !Sub ${prefix}-cf-alb
       Type: application
       Scheme: internet-facing
       IpAddressType: ipv4
@@ -289,7 +299,7 @@ Resources:
   Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
-      LoadBalancerArn: !Ref awsstudyalb
+      LoadBalancerArn: !Ref awsstudycfalb
       Port: 80
       Protocol: HTTP
       DefaultActions:
@@ -299,7 +309,7 @@ Resources:
   awsstudycftg:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: aws-study-cf-tg
+      Name: !Sub ${prefix}-cf-tg
       Protocol: HTTP
       Port: 80
       TargetType: instance
@@ -314,3 +324,118 @@ Resources:
       UnhealthyThresholdCount: 2
       Matcher:
         HttpCode: 200,300,301
+
+##CloudWatch
+  awsstudycfEC2CPUUtilizationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${prefix}-cf-cpu-utilization-testalarm"
+      AlarmDescription: !Sub "${prefix}-cf-ec2のCPU使用率が ${Threshold} %以上でトリガーされます" 
+
+      ### メトリクス
+      Namespace: "AWS/EC2"
+      Dimensions:
+        - Name: InstanceId 
+          Value: !Ref awsstudycfec2
+      MetricName: "CPUUtilization"
+      Period: 300
+      Statistic: "Average"
+      Threshold: !Ref Threshold
+      ComparisonOperator: "GreaterThanOrEqualToThreshold"
+      EvaluationPeriods: 1
+      DatapointsToAlarm: 1
+      TreatMissingData: "missing"
+      ActionsEnabled: True
+      AlarmActions:
+        - !Ref awsstudycfsnsTopic
+
+##SNSトピック・サブスク作成
+  awsstudycfsnsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Sub ${prefix}-cf-testalarm
+      TopicName: !Sub ${prefix}-cf-testalarm
+      Tags:
+      -  Key: "Name"
+         Value: !Sub ${prefix}-cf-testalarm
+
+  awsstudycfsnsSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref awsstudycfsnsTopic
+      Protocol: email 
+      Endpoint: !Ref EndPoint
+
+#WAF設定
+  awsstudycfWebAcl:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: !Sub ${prefix}-cf-web-acl
+      Scope: REGIONAL
+      DefaultAction:
+        Allow: {}
+      VisibilityConfig:
+        CloudWatchMetricsEnabled: true
+        SampledRequestsEnabled: true
+        MetricName: !Sub ${prefix}-cf-web-acl 
+      Rules:
+        - Name: AWS-AWSManagedRulesCommonRuleSet
+          Priority: 1
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+          OverrideAction:      
+            None: {}
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            SampledRequestsEnabled: true
+            MetricName: AWS-AWSManagedRulesCommonRuleSet
+  
+  awsstudycfWAFLogConfig:
+    Type: AWS::WAFv2::LoggingConfiguration
+    Properties:
+      LogDestinationConfigs: 
+        - !GetAtt awsstudycfLogGroup.Arn
+      ResourceArn: !GetAtt awsstudycfWebAcl.Arn
+  
+  awsstudycfWebAclAssociation:
+    Type: AWS::WAFv2::WebACLAssociation
+    Properties:
+      ResourceArn: !Ref awsstudycfalb
+      WebACLArn: !GetAtt awsstudycfWebAcl.Arn
+
+  awsstudycfWAFToCWLogsPolicy:
+    Type: AWS::Logs::ResourcePolicy
+    Properties:
+      PolicyName: WAFToCWLogsPolicy
+      PolicyDocument: 
+        Fn::Sub:
+          - |
+            {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Principal": {
+                    "Service": "delivery.logs.amazonaws.com"
+                  },
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "${awsstudycfLogGroup}"
+                }
+              ]
+            }
+          - LogGroupArn: !GetAtt awsstudycfLogGroup.Arn
+
+#ロググループの設定
+  awsstudycfLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      LogGroupName: aws-waf-logs-testlogs
+      RetentionInDays: 1
+
