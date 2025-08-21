@@ -281,12 +281,12 @@ Resources:
         - !GetAtt awsstudycfrdssg.GroupId
       Tags:
         - Key: Name
-          Value: aws-study-cf-rds
+          Value: !Sub ${prefix}-cf-rds
 
   awsstudycfalb:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: aws-study-cf-alb
+      Name: !Sub ${prefix}-cf-alb
       Type: application
       Scheme: internet-facing
       IpAddressType: ipv4
@@ -309,7 +309,7 @@ Resources:
   awsstudycftg:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: aws-study-cf-tg
+      Name: !Sub ${prefix}-cf-tg
       Protocol: HTTP
       Port: 80
       TargetType: instance
@@ -326,7 +326,7 @@ Resources:
         HttpCode: 200,300,301
 
 ##CloudWatch
-  EC2CPUUtilizationAlarm:
+  awsstudycfEC2CPUUtilizationAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
       AlarmName: !Sub "${prefix}-cf-cpu-utilization-testalarm"
@@ -353,13 +353,13 @@ Resources:
   awsstudycfsnsTopic:
     Type: AWS::SNS::Topic
     Properties:
-      DisplayName: aws-study-cf-testalarm
-      TopicName: aws-study-cf-testalarm
+      DisplayName: !Sub ${prefix}-cf-testalarm
+      TopicName: !Sub ${prefix}-cf-testalarm
       Tags:
       -  Key: "Name"
-         Value: "aws-study-cf-testalarm"
+         Value: !Sub ${prefix}-cf-testalarm
 
-  snsSubscription:
+  awsstudycfsnsSubscription:
     Type: AWS::SNS::Subscription
     Properties:
       TopicArn: !Ref awsstudycfsnsTopic
@@ -367,9 +367,8 @@ Resources:
       Endpoint: !Ref EndPoint
 
 #WAF設定
-  WebAcl:
+  awsstudycfWebAcl:
     Type: AWS::WAFv2::WebACL
-    DeletionPolicy: Delete
     Properties:
       Name: !Sub ${prefix}-cf-web-acl
       Scope: REGIONAL
@@ -393,22 +392,20 @@ Resources:
             SampledRequestsEnabled: true
             MetricName: AWS-AWSManagedRulesCommonRuleSet
   
-  WAFLogConfig:
+  awsstudycfWAFLogConfig:
     Type: AWS::WAFv2::LoggingConfiguration
-    DeletionPolicy: Delete
     Properties:
       LogDestinationConfigs: 
-        - !GetAtt LogGroup.Arn
-      ResourceArn: !GetAtt WebAcl.Arn
+        - !GetAtt awsstudycfLogGroup.Arn
+      ResourceArn: !GetAtt awsstudycfWebAcl.Arn
   
-  WebAclAssociation:
+  awsstudycfWebAclAssociation:
     Type: AWS::WAFv2::WebACLAssociation
-    DeletionPolicy: Delete
     Properties:
       ResourceArn: !Ref awsstudycfalb
-      WebACLArn: !GetAtt WebAcl.Arn
+      WebACLArn: !GetAtt awsstudycfWebAcl.Arn
 
-  WAFToCWLogsPolicy:
+  awsstudycfWAFToCWLogsPolicy:
     Type: AWS::Logs::ResourcePolicy
     Properties:
       PolicyName: WAFToCWLogsPolicy
@@ -427,17 +424,17 @@ Resources:
                     "logs:CreateLogStream",
                     "logs:PutLogEvents"
                   ],
-                  "Resource": "${LogGroup}"
+                  "Resource": "${awsstudycfLogGroup}"
                 }
               ]
             }
-          - LogGroupArn: !GetAtt LogGroup.Arn
+          - LogGroupArn: !GetAtt awsstudycfLogGroup.Arn
 
 #ロググループの設定
-  LogGroup:
+  awsstudycfLogGroup:
     Type: 'AWS::Logs::LogGroup'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Delete
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       LogGroupName: aws-waf-logs-testlogs
       RetentionInDays: 1
