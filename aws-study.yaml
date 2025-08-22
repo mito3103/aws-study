@@ -8,22 +8,22 @@ Parameters:
   prefix:
     Type: String
     Default: aws-study
-  
+
   DBUsername:
     Type: String
     Default: root
-  
+
   DBMasterPassword:
     NoEcho: true
     Description: RDS master password
     Type: String
 
-#Cloudwatchパラメータ
-  Threshold: 
+  #Cloudwatchパラメータ
+  Threshold:
     Description: CPUUtilization Value
     Type: Number
 
-#SNSパラメータ
+  #SNSパラメータ
   EndPoint:
     Description: SNS send email
     Type: String
@@ -36,15 +36,15 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       Tags:
-      - Key: Name
-        Value: !Sub ${prefix}-cf-vpc
+        - Key: Name
+          Value: !Sub ${prefix}-cf-vpc
 
   awsstudycfigw:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
-      - Key: Name
-        Value: !Sub ${prefix}-cf-igw
+        - Key: Name
+          Value: !Sub ${prefix}-cf-igw
 
   GatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -57,8 +57,8 @@ Resources:
     Properties:
       VpcId: !Ref awsstudycfvpc
       Tags:
-      - Key: Name
-        Value: !Sub ${prefix}-cf-public-rtb
+        - Key: Name
+          Value: !Sub ${prefix}-cf-public-rtb
 
   PublicRoute:
     Type: AWS::EC2::Route
@@ -72,22 +72,22 @@ Resources:
     Properties:
       VpcId: !Ref awsstudycfvpc
       CidrBlock: 10.0.0.0/20
-      AvailabilityZone: !Select [0,!GetAZs '']
+      AvailabilityZone: !Select [0, !GetAZs ""]
       MapPublicIpOnLaunch: true
       Tags:
-      - Key: Name
-        Value: !Sub ${prefix}-cf-public-subnet1
+        - Key: Name
+          Value: !Sub ${prefix}-cf-public-subnet1
 
   awsstudycfpublicsubnet2:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref awsstudycfvpc
       CidrBlock: 10.0.16.0/20
-      AvailabilityZone: !Select [1,!GetAZs '']
+      AvailabilityZone: !Select [1, !GetAZs ""]
       MapPublicIpOnLaunch: true
       Tags:
-      - Key: Name
-        Value: !Sub ${prefix}-cf-public-subnet2
+        - Key: Name
+          Value: !Sub ${prefix}-cf-public-subnet2
 
   PublicSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -101,51 +101,49 @@ Resources:
       SubnetId: !Ref awsstudycfpublicsubnet2
       RouteTableId: !Ref awsstudycfpublicrtb
 
-
   awsstudycfrtbprivateapnortheast1a:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref awsstudycfvpc
       Tags:
-      - Key: Name
-        Value: !Sub ${prefix}-cf-rtb-private-ap-northeast-1a
+        - Key: Name
+          Value: !Sub ${prefix}-cf-rtb-private-ap-northeast-1a
 
   awsstudycfrtbprivateapnortheast1c:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref awsstudycfvpc
       Tags:
-      - Key: Name
-        Value: !Sub ${prefix}-cf-rtb-private-ap-northeast-1c
+        - Key: Name
+          Value: !Sub ${prefix}-cf-rtb-private-ap-northeast-1c
 
   awsstudycfprivatesubnet1:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref awsstudycfvpc
       CidrBlock: 10.0.128.0/20
-      AvailabilityZone: !Select [0,!GetAZs '']
+      AvailabilityZone: !Select [0, !GetAZs ""]
       MapPublicIpOnLaunch: false
       Tags:
-      - Key: Name
-        Value: !Sub ${prefix}-cf-private-subnet1
+        - Key: Name
+          Value: !Sub ${prefix}-cf-private-subnet1
 
   awsstudycfprivatesubnet2:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref awsstudycfvpc
       CidrBlock: 10.0.144.0/20
-      AvailabilityZone: !Select [1,!GetAZs '']
+      AvailabilityZone: !Select [1, !GetAZs ""]
       MapPublicIpOnLaunch: false
       Tags:
-      - Key: Name
-        Value: !Sub ${prefix}-cf-private-subnet2
+        - Key: Name
+          Value: !Sub ${prefix}-cf-private-subnet2
 
   awsstudycfprivatesubnet1association:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref awsstudycfprivatesubnet1
       RouteTableId: !Ref awsstudycfrtbprivateapnortheast1a
-
 
   PrivateSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -161,11 +159,11 @@ Resources:
       #DisableApiTermination: true
       SubnetId: !Ref awsstudycfpublicsubnet1
       SecurityGroupIds:
-      - !Ref awsstudycfec2sg
+        - !Ref awsstudycfec2sg
       KeyName: !Ref awsstudycfkey
       Tags:
-      - Key: Name
-        Value: !Sub ${prefix}-cf-ec2
+        - Key: Name
+          Value: !Sub ${prefix}-cf-ec2
 
   awsstudycfec2sg:
     Type: AWS::EC2::SecurityGroup
@@ -173,20 +171,20 @@ Resources:
       VpcId: !Ref awsstudycfvpc
       GroupDescription: ec2security
       SecurityGroupIngress:
-      -   IpProtocol: tcp
+        - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
           CidrIp: 111.191.60.158/32
-      -   IpProtocol: tcp
+        - IpProtocol: tcp
           FromPort: 8080
           ToPort: 8080
-          SourceSecurityGroupId: !Ref awsstudycfalbsg 
+          SourceSecurityGroupId: !Ref awsstudycfalbsg
       SecurityGroupEgress:
-      -   IpProtocol: -1
+        - IpProtocol: -1
           CidrIp: 0.0.0.0/0
       Tags:
-      - Key: Name
-        Value: !Sub ${prefix}-cf-ec2-sg
+        - Key: Name
+          Value: !Sub ${prefix}-cf-ec2-sg
 
   awsstudycfrdssg:
     Type: AWS::EC2::SecurityGroup
@@ -194,39 +192,39 @@ Resources:
       VpcId: !Ref awsstudycfvpc
       GroupDescription: rdssecurity
       SecurityGroupIngress:
-      -   IpProtocol: tcp
+        - IpProtocol: tcp
           FromPort: 3306
           ToPort: 3306
           SourceSecurityGroupId: !Ref awsstudycfec2sg
       SecurityGroupEgress:
-      -   IpProtocol: -1
+        - IpProtocol: -1
           CidrIp: 0.0.0.0/0
       Tags:
-      - Key: Name
-        Value: !Sub ${prefix}-cf-rds-sg
-  
+        - Key: Name
+          Value: !Sub ${prefix}-cf-rds-sg
+
   awsstudycfalbsg:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId: !Ref awsstudycfvpc
       GroupDescription: albsecurity
       SecurityGroupIngress:
-      -   IpProtocol: tcp
+        - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
           CidrIp: 111.191.60.158/32
       Tags:
-      - Key: Name
-        Value: !Sub ${prefix}-cf-alb-sg
+        - Key: Name
+          Value: !Sub ${prefix}-cf-alb-sg
 
-  DBSubnetGroup: 
+  DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
-    Properties: 
+    Properties:
       DBSubnetGroupDescription: Description of subnet group
-      SubnetIds: 
+      SubnetIds:
         - !Ref awsstudycfprivatesubnet1
         - !Ref awsstudycfprivatesubnet2
-      Tags: 
+      Tags:
         - Key: Name
           Value: !Sub ${prefix}-cf-rds-subnetgp
 
@@ -251,21 +249,21 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      AllocatedStorage: '20'
+      AllocatedStorage: "20"
       DBInstanceClass: db.t4g.micro
       AllowMajorVersionUpgrade: false
       AutoMinorVersionUpgrade: true
-      AvailabilityZone: !Select [0,!GetAZs '']
-      BackupRetentionPeriod: '1'
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      BackupRetentionPeriod: "1"
       DBInstanceIdentifier: !Sub ${prefix}-cf-rds
       DBName: awsstudy
       DBSubnetGroupName: !Ref DBSubnetGroup
       Engine: mysql
       EngineVersion: 8.0.39
       LicenseModel: general-public-license
-      MasterUsername: !Ref DBUsername 
+      MasterUsername: !Ref DBUsername
       MasterUserPassword: !Ref DBMasterPassword
-      MonitoringInterval: '60'
+      MonitoringInterval: "60"
       MonitoringRoleArn: !GetAtt RDSMonitoringRole.Arn
       EnableCloudwatchLogsExports:
         - error
@@ -277,7 +275,7 @@ Resources:
       PubliclyAccessible: false
       StorageEncrypted: true
       StorageType: gp2
-      VPCSecurityGroups: 
+      VPCSecurityGroups:
         - !GetAtt awsstudycfrdssg.GroupId
       Tags:
         - Key: Name
@@ -295,7 +293,7 @@ Resources:
       Subnets:
         - !Ref awsstudycfpublicsubnet1
         - !Ref awsstudycfpublicsubnet2
-  
+
   Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -303,9 +301,9 @@ Resources:
       Port: 80
       Protocol: HTTP
       DefaultActions:
-      - Type: forward
-        TargetGroupArn: !Ref awsstudycftg
-      
+        - Type: forward
+          TargetGroupArn: !Ref awsstudycftg
+
   awsstudycftg:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
@@ -314,8 +312,8 @@ Resources:
       Port: 80
       TargetType: instance
       Targets:
-      - Id: !Ref awsstudycfec2
-        Port: 8080
+        - Id: !Ref awsstudycfec2
+          Port: 8080
       VpcId: !Ref awsstudycfvpc
       HealthCheckPath: /
       HealthCheckIntervalSeconds: 30
@@ -325,17 +323,17 @@ Resources:
       Matcher:
         HttpCode: 200,300,301
 
-##CloudWatch
+  ##CloudWatch
   awsstudycfEC2CPUUtilizationAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
       AlarmName: !Sub "${prefix}-cf-cpu-utilization-testalarm"
-      AlarmDescription: !Sub "${prefix}-cf-ec2のCPU使用率が ${Threshold} %以上でトリガーされます" 
+      AlarmDescription: !Sub "${prefix}-cf-ec2のCPU使用率が ${Threshold} %以上でトリガーされます"
 
       ### メトリクス
       Namespace: "AWS/EC2"
       Dimensions:
-        - Name: InstanceId 
+        - Name: InstanceId
           Value: !Ref awsstudycfec2
       MetricName: "CPUUtilization"
       Period: 300
@@ -349,24 +347,24 @@ Resources:
       AlarmActions:
         - !Ref awsstudycfsnsTopic
 
-##SNSトピック・サブスク作成
+  ##SNSトピック・サブスク作成
   awsstudycfsnsTopic:
     Type: AWS::SNS::Topic
     Properties:
       DisplayName: !Sub ${prefix}-cf-testalarm
       TopicName: !Sub ${prefix}-cf-testalarm
       Tags:
-      -  Key: "Name"
-         Value: !Sub ${prefix}-cf-testalarm
+        - Key: "Name"
+          Value: !Sub ${prefix}-cf-testalarm
 
   awsstudycfsnsSubscription:
     Type: AWS::SNS::Subscription
     Properties:
       TopicArn: !Ref awsstudycfsnsTopic
-      Protocol: email 
+      Protocol: email
       Endpoint: !Ref EndPoint
 
-#WAF設定
+  #WAF設定
   awsstudycfWebAcl:
     Type: AWS::WAFv2::WebACL
     Properties:
@@ -377,7 +375,7 @@ Resources:
       VisibilityConfig:
         CloudWatchMetricsEnabled: true
         SampledRequestsEnabled: true
-        MetricName: !Sub ${prefix}-cf-web-acl 
+        MetricName: !Sub ${prefix}-cf-web-acl
       Rules:
         - Name: AWS-AWSManagedRulesCommonRuleSet
           Priority: 1
@@ -385,20 +383,20 @@ Resources:
             ManagedRuleGroupStatement:
               VendorName: AWS
               Name: AWSManagedRulesCommonRuleSet
-          OverrideAction:      
+          OverrideAction:
             None: {}
           VisibilityConfig:
             CloudWatchMetricsEnabled: true
             SampledRequestsEnabled: true
             MetricName: AWS-AWSManagedRulesCommonRuleSet
-  
+
   awsstudycfWAFLogConfig:
     Type: AWS::WAFv2::LoggingConfiguration
     Properties:
-      LogDestinationConfigs: 
+      LogDestinationConfigs:
         - !GetAtt awsstudycfLogGroup.Arn
       ResourceArn: !GetAtt awsstudycfWebAcl.Arn
-  
+
   awsstudycfWebAclAssociation:
     Type: AWS::WAFv2::WebACLAssociation
     Properties:
@@ -409,7 +407,7 @@ Resources:
     Type: AWS::Logs::ResourcePolicy
     Properties:
       PolicyName: WAFToCWLogsPolicy
-      PolicyDocument: 
+      PolicyDocument:
         Fn::Sub:
           - |
             {
@@ -430,12 +428,11 @@ Resources:
             }
           - LogGroupArn: !GetAtt awsstudycfLogGroup.Arn
 
-#ロググループの設定
+  #ロググループの設定
   awsstudycfLogGroup:
-    Type: 'AWS::Logs::LogGroup'
+    Type: "AWS::Logs::LogGroup"
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
       LogGroupName: aws-waf-logs-testlogs
       RetentionInDays: 1
-
