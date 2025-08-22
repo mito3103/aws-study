@@ -16,7 +16,7 @@ resource "aws_security_group_rule" "public_http" {
   protocol          = "tcp"
   security_group_id = aws_security_group.awsstudytfec2sg.id
   #source_security_group_id = [albのSGを作成後入力]
-  cidr_blocks = ["0.0.0.0/0"] #自分のIPに変更する
+  cidr_blocks = ["111.189.136.62/32"]
   description = "Allow HTTP My Adress"
 }
 
@@ -27,7 +27,7 @@ resource "aws_security_group_rule" "public_ssh" {
   to_port           = 22
   protocol          = "tcp"
   security_group_id = aws_security_group.awsstudytfec2sg.id
-  cidr_blocks       = ["0.0.0.0/0"] #自分のIPに変更する
+  cidr_blocks       = ["111.189.136.62/32"]
   description       = "Allow SSH My Adress"
 }
 
