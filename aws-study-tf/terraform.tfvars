@@ -1,3 +1,0 @@
-
-prefix = "aws-study-tf"
-

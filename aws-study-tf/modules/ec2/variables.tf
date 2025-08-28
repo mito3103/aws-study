@@ -1,14 +1,12 @@
-
-variable "public_subnet_id" {
-  type = string
+variable "public_subnet_ids" {
+  type = list(string)
 }
 
-variable "awsstudytfec2sg" {
+variable "ec2_sg" {
   type = string
 }
 
 variable "prefix" {
-  type        = string
-  description = "prefix name"
+  type = string
 }
 
