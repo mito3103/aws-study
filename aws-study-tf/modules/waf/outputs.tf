@@ -7,5 +7,5 @@ output "cw_metrics_enabled" {
 }
 
 output "rule_metrics_enabled" {
-  value = aws_wafv2_web_acl.this.rule
+  value = [for r in aws_wafv2_web_acl.this.rule : r.visibility_config[0].cloudwatch_metrics_enabled]
 }
