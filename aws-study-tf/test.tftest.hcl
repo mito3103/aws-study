@@ -62,7 +62,7 @@ run "sg" {
   }
 
   variables {
-    vpc_id = 12345 #run.vpc.vpc_id
+    vpc_id = 12345 
   }
 }
 
@@ -90,8 +90,8 @@ run "ec2" {
   command = plan
 
   variables {
-    ec2_sg            = 12345          #run.sg.ec2_sg.id
-    public_subnet_ids = [12345, 67890] #run.vpc.public_subnet_ids
+    ec2_sg            = 12345          
+    public_subnet_ids = [12345, 67890] 
   }
 
   module {
@@ -114,9 +114,9 @@ run "rds" {
   command = plan
 
   variables {
-    rds_sg            = 12345 #run.sg.rds_sg.id
-    dbsubnetgroup     = 12345 #run.vpc.dbsubnetgroup
-    private_subnet_id = 12345 #run.vpc.private_subnet_id
+    rds_sg            = 12345 
+    dbsubnetgroup     = 12345 
+    private_subnet_id = 12345 
   }
 
   module {
@@ -160,10 +160,10 @@ run "alb" {
   }
 
   variables {
-    alb_sg            = 12345          #run.sg.alb_sg
-    vpc_id            = 12345          #run.vpc.vpc_id
-    ec2_id            = 12345          #run.ec2.ec2_id
-    public_subnet_ids = [12345, 67890] #run.vpc.public_subnet_ids
+    alb_sg            = 12345          
+    vpc_id            = 12345          
+    ec2_id            = 12345          
+    public_subnet_ids = [12345, 67890] 
   }
 }
 
@@ -231,8 +231,8 @@ run "cw" {
   command = plan
 
   variables {
-    ec2_id    = 12345                                                #run.ec2.ec2_id
-    sns_topic = "arn:aws:sns:ap-northeast-1:123456789012:dummytopic" #run.sns_protocol.sns_topic
+    ec2_id    = 12345                                                
+    sns_topic = "arn:aws:sns:ap-northeast-1:123456789012:dummytopic" 
   }
 
   module {
@@ -265,7 +265,7 @@ run "waf" {
   command = plan
 
   variables {
-    alb = "arn:aws:sns:ap-northeast-1:123456789012:dummy-arn" #run.alb.alb.arn
+    alb = "arn:aws:sns:ap-northeast-1:123456789012:dummy-arn" 
   }
 
   module {

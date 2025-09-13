@@ -26,7 +26,5 @@ output "enable_dns_support" {
   value = aws_vpc.this.enable_dns_support
 }
 
-# output "pub_subnet_count" {
-#   value = [for s in aws_subnet.public : s.id]
-# }
+
 
