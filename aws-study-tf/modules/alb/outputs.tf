@@ -16,5 +16,5 @@ output "alb_listener_port" {
 }
 
 output "alb_listener_type" {
-  value = aws_lb_listener.this.default_action[0]
+  value = aws_lb_listener.this.default_action[0].type
 }

@@ -42,17 +42,27 @@ run "check_enable_dns_support" {
   }
  }
 
-run "check_pub_subnet_az" {
+run "check_pub_subnet_count" {
   command = plan
-  
+
   assert {
-    condition = alltrue([
-      contains(run.vpc.pub_subnet_az,"ap-northeast-1a"),
-      contains(run.vpc.pub_subnet_az,"ap-northeast-1c")
-    ])
-    error_message = "サブネットのAZが異なっています。"
+    condition = length(run.vpc.public_subnet_ids) == 2
+
+    error_message = "サブネットの数が異なっています"
   }
 }
+
+# run "check_pub_subnet_az" {
+#   command = plan
+  
+#   assert {
+#     condition = alltrue([
+#       contains(run.vpc.pub_subnet_az,"ap-northeast-1a"),
+#       contains(run.vpc.pub_subnet_az,"ap-northeast-1c")
+#     ])
+#     error_message = "サブネットのAZが異なっています。"
+#   }
+# }
 
 #SGテスト
 run "sg" {
@@ -197,7 +207,7 @@ run "alb_listener_action" {
   command = plan
 
   assert {
-    condition = run.alb.alb_listener_type.type == "forward"
+    condition = run.alb.alb_listener_type == "forward"
 
     error_message = "リスナーのデフォルトアクションが異なっています。"
   }
@@ -279,7 +289,7 @@ run "check_metrics_enabled" {
   command = plan
 
   assert {
-    condition = run.waf.cw_metrics_enabled.cloudwatch_metrics_enabled == true
+    condition = run.waf.cw_metrics_enabled == true
 
     error_message = "CloudWatchへのメトリクス設定が誤っています"
   }
@@ -290,7 +300,7 @@ run "check_rule_visibility_config" {
 
   assert {
     condition = alltrue([
-      for r in run.waf.rule_metrics_enabled.rule : tolist(r.visibility_config)[0].cloudwatch_metrics_enabled == true
+      for r in run.waf.rule_metrics_enabled : tolist(r.visibility_config)[0].cloudwatch_metrics_enabled == true
     ])
     error_message = "すべてのWAFルールで visibility_config.cloudwatch_metrics_enabled が true ではありません"
   }

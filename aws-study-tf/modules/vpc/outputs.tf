@@ -27,6 +27,10 @@ output "enable_dns_support" {
   value = aws_vpc.this.enable_dns_support
 }
 
-output "pub_subnet_az" {
-  value = [for subnet in aws_subnet.public : subnet.availability_zone]
+output "pub_subnet_count" {
+  value = aws_subnet.public
 }
+
+# output "pub_subnet_az" {
+#   value = [for subnet in aws_subnet.public : subnet.availability_zone]
+# }
