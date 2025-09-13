@@ -122,7 +122,7 @@ resource "aws_cloudwatch_log_group" "waf_logs" {
   name              = "aws-waf-logs-${var.prefix}-testlogs"
   retention_in_days = 1
   lifecycle {
-    prevent_destroy       = false #実際はtrueの方が良い
+    prevent_destroy       = true
     create_before_destroy = true
   }
 }

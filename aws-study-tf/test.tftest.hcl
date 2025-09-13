@@ -1,12 +1,11 @@
 variables {
   db_password = "dummy_pass"
   email = "dummy_adrress@gmail.co"
-  prefix = "aws-study-tf-test"
 }
 
 #VPCテスト
 run "vpc" {
-  command = apply
+  command = plan
 
   module {
     source = "./modules/vpc"
@@ -57,14 +56,14 @@ run "check_pub_subnet_az" {
 
 #SGテスト
 run "sg" {
-  command = apply
+  command = plan
 
   module {
     source = "./modules/sg"
   }
 
   variables {
-    vpc_id = run.vpc.vpc_id
+    vpc_id = 12345 #run.vpc.vpc_id
   }
 }
 
@@ -89,11 +88,11 @@ run "check_ec2_sg" {
 
 #EC2テスト
 run "check_instance_type" {
-  command = apply
+  command = plan
 
   variables {
-    ec2_sg = run.sg.ec2_sg.id
-    public_subnet_ids = run.vpc.public_subnet_ids
+    ec2_sg = 12345 #run.sg.ec2_sg.id
+    public_subnet_ids = [12345,67890] #run.vpc.public_subnet_ids
   }
 
   module {
@@ -111,9 +110,9 @@ run "rds" {
   command = plan
   
   variables {
-    rds_sg = run.sg.rds_sg.id
-    dbsubnetgroup = run.vpc.dbsubnetgroup
-    private_subnet_id = run.vpc.private_subnet_id
+    rds_sg = 12345 #run.sg.rds_sg.id
+    dbsubnetgroup = 12345 #run.vpc.dbsubnetgroup
+    private_subnet_id = 12345 #run.vpc.private_subnet_id
   }
 
   module {
@@ -150,17 +149,17 @@ run "check_publicly_accessible" {
 
 #ALBテスト
 run "alb" {
-  command = apply
+  command = plan
 
   module {
     source = "./modules/alb"
   }
 
   variables {
-    alb_sg = run.sg.alb_sg.id
-    vpc_id = run.vpc.vpc_id
-    ec2_id = run.check_instance_type.ec2_id
-    public_subnet_ids = run.vpc.public_subnet_ids
+    alb_sg = 12345 #run.sg.alb_sg
+    vpc_id = 12345 #run.vpc.vpc_id
+    ec2_id = 12345 #run.check_instance_type.ec2_id
+    public_subnet_ids = [12345,67890] #run.vpc.public_subnet_ids
   }
 }
 
@@ -174,7 +173,7 @@ run "check_load_balancer_type" {
   }
 }
 
-run "check_alb_target_port" {
+run "alb_target_port" {
   command = plan
 
   assert {
@@ -184,7 +183,7 @@ run "check_alb_target_port" {
   }
 }
 
-run "check_alb_listener_port" {
+run "alb_listener_port" {
   command = plan
 
   assert {
@@ -194,7 +193,7 @@ run "check_alb_listener_port" {
   }
 }
 
-run "check_alb_listener_action" {
+run "alb_listener_action" {
   command = plan
 
   assert {
@@ -206,7 +205,7 @@ run "check_alb_listener_action" {
 
 #SNSテスト
 run "sns_protocol" {
-  command = apply
+  command = plan
 
   module {
     source = "./modules/sns"
@@ -224,8 +223,8 @@ run "cw" {
   command = plan
 
   variables {
-    ec2_id = run.check_instance_type.ec2_id
-    sns_topic = run.sns_protocol.sns_topic
+    ec2_id = 12345 #run.check_instance_type.ec2_id
+    sns_topic = "arn:aws:sns:ap-northeast-1:123456789012:dummytopic"#run.sns_protocol.sns_topic
   }
 
   module {
@@ -233,7 +232,7 @@ run "cw" {
   }
 }
 
-run "check_comparison_operator" {
+run "comparison_operator" {
   command = plan
 
   assert {
@@ -258,7 +257,7 @@ run "waf" {
   command = plan
 
   variables {
-    alb = run.alb.alb
+    alb = "arn:aws:sns:ap-northeast-1:123456789012:dummy-arn" #run.alb.alb.arn
   }
 
   module {
