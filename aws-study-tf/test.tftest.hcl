@@ -52,17 +52,6 @@ run "check_pub_subnet_count" {
   }
 }
 
-# run "check_pub_subnet_az" {
-#   command = plan
-
-#   assert {
-#     condition = alltrue([
-#       contains(run.vpc.pub_subnet_az,"ap-northeast-1a"),
-#       contains(run.vpc.pub_subnet_az,"ap-northeast-1c")
-#     ])
-#     error_message = "サブネットのAZが異なっています。"
-#   }
-# }
 
 #SGテスト
 run "sg" {
@@ -114,7 +103,8 @@ run "check_instance_type" {
   command = plan
 
   assert {
-    condition     = run.ec2.instance_type == "t2.micro"
+    condition = run.ec2.instance_type == "t2.micro"
+
     error_message = "インスタンスタイプが異なっています。"
   }
 }
@@ -309,7 +299,6 @@ run "check_rule_visibility_config" {
   assert {
     condition = alltrue(
       run.waf.rule_metrics_enabled
-      #for r in run.waf.rule_metrics_enabled : tolist(r.visibility_config)[0].cloudwatch_metrics_enabled == true
     )
     error_message = "すべてのWAFルールで visibility_config.cloudwatch_metrics_enabled が true ではありません"
   }

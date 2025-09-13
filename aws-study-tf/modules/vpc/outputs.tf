@@ -14,7 +14,6 @@ output "dbsubnetgroup" {
   value = aws_db_subnet_group.this.name
 }
 
-#テスト用
 output "vpc_cidr_block" {
   value = aws_vpc.this.cidr_block
 }
@@ -31,6 +30,3 @@ output "enable_dns_support" {
 #   value = [for s in aws_subnet.public : s.id]
 # }
 
-# output "pub_subnet_az" {
-#   value = [for subnet in aws_subnet.public : subnet.availability_zone]
-# }
