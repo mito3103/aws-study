@@ -65,5 +65,5 @@ variable "db_password" {
 
 variable "email" {
   type        = string
-  description = "SNS通知先"
+  description = "SNS通知先です"
 }
