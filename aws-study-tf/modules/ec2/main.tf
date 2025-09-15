@@ -7,7 +7,7 @@ resource "aws_instance" "this" {
   key_name               = "aws-study-tf-key" #今回は既存のキーペアを使用
 
   tags = {
-    Name = "${var.prefix}-ec2"
+    Name = "${var.prefix}-ecc2"
   }
 }
 
