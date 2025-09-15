@@ -7,10 +7,10 @@ on:
       - synchronize
     branches:
       - main
-    paths:
-      - "**.tf"
-      - "**.tftest.hcl"
-      - ".github/workflows/terraform-test.yml"
+    # paths:
+    #   - "**.tf"
+    #   - "**.tftest.hcl"
+    #   - ".github/workflows/terraform-test.yml"
 
   push:
     paths:
