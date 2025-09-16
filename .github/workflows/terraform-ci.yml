@@ -41,9 +41,9 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
 
-      - name: Restore tfvars file
+      - name: Restore tfvars from base64 secret
         run: |
-          echo "${{ secrets.TFVARS_CONTENT }}" > terraform.tfvars
+          echo "${{ secrets.TFVARS_B64 }}" | base64 -d > terraform.tfvars
 
       - name: Terraform Init
         run: terraform init
