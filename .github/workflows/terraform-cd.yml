@@ -1,20 +1,17 @@
-name: Terraform CI
+name: Terraform CD
 
 on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
+  push:
     branches: [main]
-    paths:
-      - "**.tf"
-      - "**.tftest.hcl"
-      - ".github/workflows/terraform-ci.yml"
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ap-northeast-1
 
     defaults:
       run:
@@ -34,5 +31,5 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Test
-        run: terraform test
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
