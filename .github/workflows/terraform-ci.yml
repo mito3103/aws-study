@@ -41,6 +41,10 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
 
+      - name: Restore tfvars file
+        run: |
+          echo "${{ secrets.TFVARS_CONTENT }}" > terraform.tfvars
+
       - name: Terraform Init
         run: terraform init
 
