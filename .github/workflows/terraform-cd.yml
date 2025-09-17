@@ -3,6 +3,10 @@ name: Terraform CD
 on:
   push:
     branches: [main]
+    paths:
+      - "**.tf"
+      - "**.tftest.hcl"
+      - ".github/workflows/*.yml"
 
 jobs:
   terraform:

@@ -10,7 +10,7 @@ on:
     paths:
       - "**.tf"
       - "**.tftest.hcl"
-      - ".github/workflows/terraform-ci.yml"
+      - ".github/workflows/*.yml"
 
 jobs:
   terraform:
@@ -38,6 +38,12 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+
+      - name: Terraform Format Check
+        run: terraform fmt
+
+      - name: Terraform Validate
+        run: terraform validate
 
       - name: Terraform Test
         run: terraform test
