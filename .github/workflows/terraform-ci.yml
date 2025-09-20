@@ -1,4 +1,4 @@
-name: Terraform CI
+name: Terraform CI #鍵修正
 
 on:
   pull_request:
