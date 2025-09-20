@@ -1,4 +1,4 @@
-name: Terraform CD
+name: Terraform CD #ssh修正
 
 on:
   push:
