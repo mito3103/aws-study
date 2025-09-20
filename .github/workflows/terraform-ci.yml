@@ -1,4 +1,4 @@
-name: Terraform CI
+name: Terraform CI #テスト
 
 on:
   pull_request:
@@ -17,7 +17,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  terraform:
+  terraform-check:
     runs-on: ubuntu-latest
 
     env:
@@ -81,3 +81,35 @@ jobs:
                repo: context.repo.repo,
                body: output
              })
+
+  ansible-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ec2-3-112-188-152.ap-northeast-1.compute.amazonaws.com >> ~/.ssh/known_hosts
+
+      - name: Syntax check
+        run: |
+          ansible-playbook -i inventory/production.yml playbook/deploy-java.yml --syntax-check
+
+      - name: Dry run
+        run: |
+          ansible-playbook -i inventory/production.yml playbook/deploy-java.yml --check -v
