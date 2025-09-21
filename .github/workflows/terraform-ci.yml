@@ -96,6 +96,7 @@ jobs:
       - name: セキュリティグループの更新
         run: |
           aws ec2 authorize-security-group-ingress \
+          --region ap-northeast-1 \
           --group-id=sg-033646bf4202529c6 \
           --protocol=tcp \
           --port=22 \
@@ -129,6 +130,7 @@ jobs:
       - name: セキュリティグループのルール削除
         run: |
           aws ec2 revoke-security-group-ingress \
+           --region ap-northeast-1 \
           --group-id=sg-033646bf4202529c6 \
           --protocol=tcp \
           --port=22 \
