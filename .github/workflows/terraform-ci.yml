@@ -89,6 +89,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: AWS認証情報の設定
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+
+      - name: Public IP
+        id: ip
+        uses: haythem/public-ip@v1.2
+
+      - name: セキュリティグループの更新
+        run: |
+          aws ec2 authorize-security-group-ingress \
+          --group-id=sg-033646bf4202529c6 \
+          --protocol=tcp \
+          --port=22 \
+          --cidr=${{ steps.ip.outputs.ipv4 }}/32 # github global ip
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -113,3 +132,11 @@ jobs:
       - name: Dry run
         run: |
           ansible-playbook -i inventory/production.yml playbook/deploy-java.yml --check -v
+
+      - name: セキュリティグループのルール削除
+        run: |
+          aws ec2 revoke-security-group-ingress \
+          --group-id=sg-033646bf4202529c6 \
+          --protocol=tcp \
+          --port=22 \
+          --cidr=${{ steps.ip.outputs.ipv4 }}/32
