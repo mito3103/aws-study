@@ -32,6 +32,6 @@
   tasks:
     - name: Spring Boot アプリを起動
       systemd:
-        name: springboot
+        name: helloworld
         state: restarted
         enabled: yes
