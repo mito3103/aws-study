@@ -1,4 +1,4 @@
-name: Terraform CI #テスト
+name: Terraform CI
 
 on:
   pull_request:
