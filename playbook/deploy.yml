@@ -24,6 +24,7 @@
       ansible.builtin.git:
         repo: "https://github.com/mito3103/helloworld.git"
         dest: /home/ec2-user
+      when: not ansible_check_mode
 
 - name: Start SpringBoot
   hosts: all
