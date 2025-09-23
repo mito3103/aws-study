@@ -127,11 +127,11 @@ jobs:
 
       - name: Syntax check
         run: |
-          ansible-playbook -i inventory/production.yml playbook/deploy-java.yml --syntax-check
+          ansible-playbook -i inventory/production.yml playbook/deploy.yml --syntax-check
 
       - name: Dry run
         run: |
-          ansible-playbook -i inventory/production.yml playbook/deploy-java.yml --check -v
+          ansible-playbook -i inventory/production.yml playbook/deploy.yml --check -v
 
       - name: セキュリティグループのルール削除
         run: |
