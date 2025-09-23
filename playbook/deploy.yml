@@ -11,10 +11,10 @@
   hosts: all
   become: true
   tasks:
-    name: git intall
-    ansible.builtin.package:
-      name: git
-      state: present
+    - name: git intall
+      ansible.builtin.package:
+        name: git
+        state: present
 
 - name: Git Clone SpringBoot
   hosts: all
