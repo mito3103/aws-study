@@ -8,9 +8,13 @@
         state: present
 
 - name: Git install
-  ansible.builtin.package:
-    name: git
-    state: present
+  host: all
+  become: true
+  tasks:
+    name: git intall
+    ansible.builtin.package:
+      name: git
+      state: present
 
 - name: Git Clone SpringBoot
   hosts: all
