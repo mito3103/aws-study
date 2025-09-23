@@ -7,7 +7,7 @@
         name: java-21-amazon-corretto-devel
         state: present
 
-- name: Git install
+- name: Git install and Clone
   hosts: all
   become: true
   tasks:
@@ -16,15 +16,11 @@
         name: git
         state: present
 
-- name: Git Clone SpringBoot
-  hosts: all
-  become: yes
-  tasks:
     - name: Clone a Git repository
       ansible.builtin.git:
         repo: "https://github.com/mito3103/helloworld.git"
         dest: /home/ec2-user
-      when: not ansible_check_mode
+      #when: not ansible_check_mode
 
 - name: Start SpringBoot
   hosts: all
