@@ -81,7 +81,11 @@ jobs:
 
       - name: Run Ansible playbook
         run: |
-          ansible-playbook -i inventory/production.yml playbook/deploy-java.yml
+          ansible-playbook -i inventory/production.yml playbook/deploy.yml
+
+      - name: Run Java #必要？
+        run: |
+          ansible-playbook -i hosts run_jar.yml -u ユーザー名
 
       - name: セキュリティグループのルール削除
         run: |

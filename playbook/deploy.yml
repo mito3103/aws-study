@@ -1,0 +1,28 @@
+- name: Install Java on Amazon Linux
+  hosts: all
+  become: true
+  tasks:
+    - name: Install Java 21 (Amazon Linux 2)
+      yum:
+        name: java-21-amazon-corretto-devel
+        state: present
+
+- name: Git install
+  ansible.builtin.package:
+    name: git
+    state: present
+
+- name: Git Clone SpringBoot
+  hosts: all
+  become: yes
+  tasks:
+    - name: Clone a Git repository
+      ansible.builtin.git:
+        repo: "https://github.com/mito3103/helloworld.git"
+        dest: /home/ec2-user
+
+- name: Spring Boot アプリを起動
+  systemd:
+    name: springboot
+    state: restarted
+    enabled: yes
