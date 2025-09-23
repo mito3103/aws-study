@@ -11,8 +11,8 @@
   hosts: all
   become: true
   tasks:
-    - name: git intall
-      ansible.builtin.package:
+    - name: git install
+      ansible.builtin.yum:
         name: git
         state: present
 
