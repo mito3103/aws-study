@@ -16,19 +16,12 @@
         name: git
         state: present
 
-    - name: Check environment PATH
-      ansible.builtin.shell: echo $PATH
-      register: current_path
-
-    - name: Show PATH
-      debug:
-        var: current_path.stdout
-
     - name: Clone a Git repository
       ansible.builtin.git:
         repo: "https://github.com/mito3103/helloworld.git"
         dest: /home/ec2-user
-      #when: not ansible_check_mode
+        environment:
+          PATH: "/usr/bin:/bin:/usr/local/bin:/usr/sbin:/sbin"
 
 - name: Start SpringBoot
   hosts: all
