@@ -16,8 +16,13 @@
         name: git
         state: present
 
-    - name: Check git
-      run: which git
+    - name: Check environment PATH
+      ansible.builtin.shell: echo $PATH
+      register: current_path
+
+    - name: Show PATH
+      debug:
+        var: current_path.stdout
 
     - name: Clone a Git repository
       ansible.builtin.git:
