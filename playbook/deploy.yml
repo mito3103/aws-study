@@ -19,7 +19,7 @@
     - name: Clone a Git repository
       ansible.builtin.git:
         repo: "https://github.com/mito3103/helloworld.git"
-        dest: /home/ec2-user
+        dest: /springboot/app
       when: not ansible_check_mode
 
 - name: Start SpringBoot
