@@ -16,6 +16,9 @@
         name: git
         state: present
 
+    - name: Check git
+      run: which git
+
     - name: Clone a Git repository
       ansible.builtin.git:
         repo: "https://github.com/mito3103/helloworld.git"
