@@ -20,8 +20,7 @@
       ansible.builtin.git:
         repo: "https://github.com/mito3103/helloworld.git"
         dest: /home/ec2-user
-      environment:
-        PATH: "/usr/bin:/bin:/usr/local/bin:/usr/sbin:/sbin"
+        executable: /usr/bin/git
 
 - name: Start SpringBoot
   hosts: all
