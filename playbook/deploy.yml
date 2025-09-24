@@ -16,6 +16,14 @@
         name: git
         state: present
 
+    - name: Locate git binary
+      ansible.builtin.shell: command -v git
+      register: git_path
+
+    - name: Show path to git
+      ansible.builtin.debug:
+        var: git_path.stdout
+
     - name: Clone a Git repository
       ansible.builtin.git:
         repo: "https://github.com/mito3103/helloworld.git"
