@@ -27,8 +27,4 @@
   become: true
   tasks:
     - name: Spring Boot アプリを起動
-      systemd:
-        name: helloworld
-        state: restarted
-        enabled: yes
-      when: not ansible_check_mode
+      shell: nohup java -jar demo --server.port=8080 &
