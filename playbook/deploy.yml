@@ -13,7 +13,7 @@
   tasks:
     - name: Ensure destination directory exists
       ansible.builtin.file:
-        path: /springboot
+        path: /home/ec2-user/springboot
         state: directory
         mode: "0755"
 
@@ -29,12 +29,14 @@
     - name: Clone a Git repository
       ansible.builtin.git:
         repo: "https://github.com/mito3103/helloworld.git"
-        dest: /springboot/app
+        dest: /home/ec2-user/springboot
       when: not ansible_check_mode
 
 - name: Start SpringBoot
   hosts: all
   become: true
   tasks:
-    - name: Spring Boot アプリを起動
-      shell: nohup java -jar demo --server.port=8080 &
+    - name: Build the application using gradlew
+      ansible.builtin.command: ./gradlew bootRun
+      args:
+        chdir: /home/ec2-user/springboot/demo
