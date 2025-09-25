@@ -30,6 +30,7 @@
       ansible.builtin.git:
         repo: "https://github.com/mito3103/helloworld.git"
         dest: /home/ec2-user/springboot
+        force: yes
       when: not ansible_check_mode
 
     - name: Ensure gradlew is executable
