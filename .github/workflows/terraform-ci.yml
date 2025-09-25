@@ -107,7 +107,7 @@ jobs:
           --group-id=sg-033646bf4202529c6 \
           --protocol=tcp \
           --port=22 \
-          --cidr=${{ steps.ip.outputs.ipv4 }}/32 # github global ip
+          --cidr=${{ steps.ip.outputs.ipv4 }}/32
 
       - name: Set up Python
         uses: actions/setup-python@v4
