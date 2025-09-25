@@ -11,7 +11,7 @@ on:
       - "**.tf"
       - "**.tftest.hcl"
       - ".github/workflows/*.yml"
-      - ".playbook/deploy.yml"
+      - "playbook/deploy.yml"
 
 permissions:
   contents: read

@@ -1,4 +1,4 @@
-name: Terraform CD #テスト
+name: Terraform CD
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - "**.tf"
       - "**.tftest.hcl"
       - ".github/workflows/*.yml"
-      - ".playbook/deploy.yml"
+      - "playbook/deploy.yml"
 
 jobs:
   terraform:
