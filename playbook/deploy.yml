@@ -32,6 +32,12 @@
         dest: /home/ec2-user/springboot
       when: not ansible_check_mode
 
+    - name: Ensure gradlew is executable
+      ansible.builtin.file:
+        path: /springboot/demo/gradlew
+        state: file
+        mode: "0755"
+
 - name: Start SpringBoot
   hosts: all
   become: true
