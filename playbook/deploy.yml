@@ -55,9 +55,3 @@
       args:
         chdir: /home/ec2-user/springboot/demo
       when: not ansible_check_mode
-
-    # - name: Build the application using gradlew
-    #   ansible.builtin.command: ./gradlew bootRun
-    #   args:
-    #     chdir: /home/ec2-user/springboot/demo
-    #   when: not ansible_check_mode
