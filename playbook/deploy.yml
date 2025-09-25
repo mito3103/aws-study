@@ -7,6 +7,16 @@
         name: java-21-amazon-corretto-devel
         state: present
 
+- name: create directory
+  hosts: all
+  become: true
+  tasks:
+    - name: Ensure destination directory exists
+      ansible.builtin.file:
+        path: /springboot
+        state: directory
+        mode: "0755"
+
 - name: Git install and Clone
   hosts: all
   become: true

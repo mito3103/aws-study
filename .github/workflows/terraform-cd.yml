@@ -1,4 +1,4 @@
-name: Terraform CD #Test
+name: Terraform CD
 
 on:
   push:
