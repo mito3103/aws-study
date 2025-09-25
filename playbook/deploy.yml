@@ -43,8 +43,20 @@
   hosts: all
   become: true
   tasks:
-    - name: Build the application using gradlew
-      ansible.builtin.command: ./gradlew bootRun
+    - name: Build the JAR file
+      ansible.builtin.command: ./gradlew build
       args:
         chdir: /home/ec2-user/springboot/demo
       when: not ansible_check_mode
+
+    - name: Run Spring Boot app in background
+      ansible.builtin.shell: "nohup java -jar build/libs/demo-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &"
+      args:
+        chdir: /home/ec2-user/springboot/demo
+      when: not ansible_check_mode
+
+    # - name: Build the application using gradlew
+    #   ansible.builtin.command: ./gradlew bootRun
+    #   args:
+    #     chdir: /home/ec2-user/springboot/demo
+    #   when: not ansible_check_mode
