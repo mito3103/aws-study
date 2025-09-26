@@ -6,7 +6,6 @@
       yum:
         name: java-21-amazon-corretto-devel
         state: present
-
 - name: create directory
   hosts: all
   become: true
